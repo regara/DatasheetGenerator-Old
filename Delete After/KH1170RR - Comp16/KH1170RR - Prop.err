@@ -1,0 +1,10 @@
+---------------
+Warning: Zone '1st Floor-zn': Unmet cooling loads during 16 hours of run.
+---------------
+Warning: Zone 'Garage-grg': Condensation occurred in 528 subhours of run.
+    Total condensation heat = 0.621606 kBtu.
+---------------
+Warning: 
+  Zone 'Attic Garage-atc': Condensation occurred in 6920 subhours of run.
+    Total condensation heat = 5.10503 kBtu.
+---------------

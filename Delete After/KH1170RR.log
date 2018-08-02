@@ -1,0 +1,49 @@
+2018-08-02 11:40:21 - -----------------------------------------------------------------------------
+2018-08-02 11:40:21 - Opening Project 'Delete After\KH1170RR.ribd16x'...
+2018-08-02 11:40:22 -    Model load successful into CBECC-Res 2016.3.1 (1019)
+2018-08-02 11:40:22 - Performing Building Database check...
+2018-08-02 11:40:22 - Building Database check completed, no problems found.
+2018-08-02 11:40:24 - Project Saved
+2018-08-02 11:40:28 - Performing Building Database check...
+2018-08-02 11:40:28 - Building Database check completed, no problems found.
+2018-08-02 11:40:28 -    Analysis being performed by CompMgrVersion 'BEMCmpMgr 2016.3.1 (1149)' via SoftwareVersion 'CBECC-Res 2016.3.1 (1019)'
+2018-08-02 11:42:01 -   Generating report 'CF1R_NCB_PRF16' pdf+xml (signed)
+2018-08-02 11:42:01 -     Communicating w/ report generator using Qt
+2018-08-02 11:42:13 - Analysis result:  PASS  (TDV margin: 5.70 (13.3%))  Processing time:  Overall 105.1 / CSE 83.6 / ModelPrep 4.72 / ResultsProcessing 3.73 / ReportGen 12.2 / ResXMLWriting 0.18 / Model&SecurChks 0.12 / Model&HrlyCSVExports 0.09 / DHWSim 0.00 / LoadModel 0.00 / Other 0.49
+2018-08-02 11:57:24 - -----------------------------------------------------------------------------
+2018-08-02 11:57:24 - Opening Project 'Delete After\KH1170RR.ribd16x'...
+2018-08-02 11:57:24 -    Model load successful into CBECC-Res 2016.3.1 (1019)
+2018-08-02 11:57:25 - Performing Building Database check...
+2018-08-02 11:57:25 - Building Database check completed, no problems found.
+2018-08-02 13:15:02 - -----------------------------------------------------------------------------
+2018-08-02 13:15:02 - Opening Project 'Delete After\KH1170RR.ribd16x'...
+2018-08-02 13:15:03 -    Model load successful into CBECC-Res 2016.3.1 (1019)
+2018-08-02 13:15:03 - Performing Building Database check...
+2018-08-02 13:15:03 - Building Database check completed, no problems found.
+2018-08-02 13:25:41 - Project Saved
+2018-08-02 13:25:45 - Performing Building Database check...
+2018-08-02 13:25:45 - Building Database check completed, no problems found.
+2018-08-02 13:25:46 -    Analysis being performed by CompMgrVersion 'BEMCmpMgr 2016.3.1 (1149)' via SoftwareVersion 'CBECC-Res 2016.3.1 (1019)'
+2018-08-02 13:26:44 -   Generating report 'CF1R_NCB_PRF16' pdf+xml (signed)
+2018-08-02 13:26:44 -     Communicating w/ report generator using Qt
+2018-08-02 13:26:54 - Analysis result:  PASS  (TDV margin: 7.26 (14.0%))  Processing time:  Overall 69.6 / CSE 46.6 / ModelPrep 7.33 / ResultsProcessing 3.08 / ReportGen 10.6 / ResXMLWriting 0.34 / Model&SecurChks 0.58 / Model&HrlyCSVExports 0.53 / DHWSim 0.00 / LoadModel 0.00 / Other 0.58
+2018-08-02 13:51:31 - -----------------------------------------------------------------------------
+2018-08-02 13:51:31 - Opening Project 'Delete After\KH1170RR.ribd16x'...
+2018-08-02 13:51:31 -    Model load successful into CBECC-Res 2016.3.1 (1019)
+2018-08-02 13:51:32 - Performing Building Database check...
+2018-08-02 13:51:32 - Building Database check completed, no problems found.
+2018-08-02 14:23:13 - Project Saved
+2018-08-02 14:23:17 - Performing Building Database check...
+2018-08-02 14:23:17 - Building Database check completed, no problems found.
+2018-08-02 14:23:17 -    Analysis being performed by CompMgrVersion 'BEMCmpMgr 2016.3.1 (1149)' via SoftwareVersion 'CBECC-Res 2016.3.1 (1019)'
+2018-08-02 14:24:24 -   Generating report 'CF1R_NCB_PRF16' pdf+xml (signed)
+2018-08-02 14:24:24 -     Communicating w/ report generator using Qt
+2018-08-02 14:24:34 - Analysis result:  PASS  (TDV margin: 6.51 (12.5%))  Processing time:  Overall 77.3 / CSE 53.6 / ModelPrep 8.50 / ResultsProcessing 3.43 / ReportGen 10.5 / ResXMLWriting 0.27 / Model&SecurChks 0.12 / Model&HrlyCSVExports 0.10 / DHWSim 0.00 / LoadModel 0.00 / Other 0.69
+2018-08-02 15:20:05 - Project Saved
+2018-08-02 15:20:13 - Project Saved
+2018-08-02 15:20:14 - Performing Building Database check...
+2018-08-02 15:20:14 - Building Database check completed, no problems found.
+2018-08-02 15:20:14 -    Analysis being performed by CompMgrVersion 'BEMCmpMgr 2016.3.1 (1149)' via SoftwareVersion 'CBECC-Res 2016.3.1 (1019)'
+2018-08-02 15:21:16 -   Generating report 'CF1R_NCB_PRF16' pdf+xml (signed)
+2018-08-02 15:21:16 -     Communicating w/ report generator using Qt
+2018-08-02 15:21:27 - Analysis result:  PASS  (TDV margin: 6.78 (13.1%))  Processing time:  Overall 73.0 / CSE 52.1 / ModelPrep 5.24 / ResultsProcessing 3.16 / ReportGen 11.4 / ResXMLWriting 0.22 / Model&SecurChks 0.12 / Model&HrlyCSVExports 0.10 / DHWSim 0.00 / LoadModel 0.00 / Other 0.61

@@ -1,0 +1,118 @@
+
+<!--
+After Calc split the feilds in 2 rows with an obvious seperator
+
+<Model Name="Proposed">          ???????
+Model.project. CHILDTOGET
+
+Future Version ideas
+  Button on click select Datasheet columns amount / layout
+  Have an x above each column to delete them if not needed.
+  Ability to move them around
+
+
+Each assembly <Cons><Cons/>is stored see if theres an area that says this assembly is true
+
+
+XmlNodeList attrElements
+    = yourDocument.SelectNodes("/nodes/node/attribute[@name='Proposed']"); OR USE Name="User Input" seems like a quicker sort if (values)
+
+
+
+private void buttonGetFile_Click(object sender, EventArgs e)
+{
+    OpenFileDialog dialog = new OpenFileDialog();
+    dialog.Filter = "Text files | *.xml"; // file types, that will be allowed to upload
+    dialog.Multiselect = false; // allow/deny user to upload more than one file at a time
+    if (dialog.ShowDialog() == DialogResult.OK) // if user clicked OK
+    {
+        String path = dialog.FileName; // get name of file
+        using (StreamReader reader = new StreamReader(new FileStream(path, FileMode.Open), new UTF8Encoding())) // do anything you want, e.g. read it
+        {
+                // ...
+        }
+    }
+}
+
+
+
+
+
+
+FLOW ->
+  Upload an xml file(CBECC generated).
+  Take that file and make a new xml object with the data thats important.
+  Take that xml object and append it into a 1 page xml template (datasheet.xml)
+      Future add the other datasheets 1-15 (prevent submit until 1-15 xml files are ready)  ***** To prevent future errors name each cell something folloed by its column number ex... Asphalt1 Asphalt2    RadientYes1 RadientYes2
+
+
+
+
+
+-->
+
+{
+  Photovoltaic                                 _ N/A || Yes (X.X kWdc) *** Yes (<PVMinRatedPwrRpt>(if length <=1 add .00)
+  HERS Index Score                             _ Not currently implimented needs more data ***
+  Plan (XXXXXXXXXXXXXX-Coat Stucco Finish)     _ PLAN NAME *** <Name>
+  File Name                                    _ FILE NAME *** <ModelFile>
+  Square Footage                               _ Sqft ***<CondFloorArea>
+  % Above Code                                 _ X.X% (make sure negative numbers are alowed) *** <EnergyUse><Name>.text(EU-Compliance).sibling(<PctImproveTDV>) || array of [<EnergyUse>][9]
+  % Cooling Improvement                        _ X.X% (make sure negative numbers are alowed) *** <EnergyUse><Name>.text(EU-SpcClg).sibling(<PctImproveTDV>) || array of [<EnergyUse>][1]
+  Number of Stories                            _ STORIES ***
+  Glazing Percentage                           _ X.X% ***
+  Roofing Material                             _ Most likely something like switch(ROOFING) Case:asph return asphalt; Case: sheet return metal; ect... ***
+
+  Reflectance/Emissivity                       _ REFLECTANCE / EMISSIVITY *** <Attic><RoofSolReflect> / <Attic><RoofEmiss>
+  Attic Floor/Vault**                          _ R-ROOFINGVALUE ***
+  Attic Above Deck                             _ Hide this field || R-ABOVEDECK Value *** if(<Attic><AboveDeckRoofIns>)
+  Attic Below Deck                             _ - || R-BELOWDECK Value *** if(<Attic><BelowDeckRoofIns>)
+  Radiant Barrier                              _ - || Yes ***
+
+
+  Wall 2x4                                     _ - or R-WALLVALUE ***  Foreach( wall as <ExtWall> ) IF (<ExtWall> Contains Garage) R-0 else <Construction>.Value
+  Wall 2x6                                     _ - or R-WALLVALUE ***  Foreach( wall as <ExtWall> ) IF (<ExtWall> Contains Garage) R-0 else <Construction>.Value
+
+<!-- test if values <=> R-15 and if true then set wall value
+if contains( "+" ) Add that too
+
+-->
+
+
+
+
+  Knee Wall                                    _
+  Floor @ 2nd Floor Overhang                   _
+  Sub Floor/Slab                               _ FLOORTYPE ***
+  Minimum SEER/EER Value                       _ SEER / EER *** <SCSysRpt><MinCoolSEER> / <SCSysRpt><MinCoolEER>
+
+  Minimum AFUE                                 _ 0.XX ***  0.<MinHeatEffic>
+  Duct Insulation                              _ - || R-DUCTVALUE ***
+  Bypass Ducts                                 _ - || (Ask about other values) ***
+
+  Whole House Fan (CFM)                        _ - || Yes (WHF) *** <<HVACSys>.forEach(WHF as <ClVentFan>) if(<NumAssignments>) <CoolingVent> (for each append Yes(<CoolingVent>.value ) With a + inbetween them)
+  Fan Wattage                                  _ - || Yes ***
+  Airflow (CFM)                                _ *** Yes(<MinCoolCFMperTon>)
+  Duct Testing Required                        _ ***
+  Indoor Air Quality (CFM)                     _ ***
+  Refrigerant Charge                           _ *** <SCSysRpt><HERSACCharg>
+
+  SEER Verification                            _ *** <SCSysRpt><HERSSEER>
+  EER Verification                             _ *** <SCSysRpt><HERSEER>
+  Infiltration (CFM)                           _ ***
+  Ducts in Conditioned Space                   _ ***
+  Low Leakage Air Handler                      _ ***
+  Buried Ducts                                 _ ***
+  Surface Area                                 _ ***
+  Insulation Inspection**                      _ - || Yes *** {{model Proposed}}<SpeclFtr> (needs to test but I think all the tests are there.)
+
+  Pipe Insulation Credit                       _ - || Yes ***
+  Uniform Energy Factor (Tank Size)            _ X.XX(TANKSIZE) *** <DHWHeater><EnergyFactor>(<DHWHeater><TankVolume>)
+  Distribution                                 _ Standard || (Ask about other values) ***
+
+
+}
+
+Windows {
+  type: Value [0.30,0.25]  **** foreach<ExtWall> foreach<Win> --><NFRCUfactor>.value   || <NFRCSHGC>.value
+}
