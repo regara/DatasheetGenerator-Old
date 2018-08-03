@@ -69,7 +69,7 @@
                       <w:rFonts w:ascii="Arial" w:hAnsi="Arial" />
                       <w:sz w:val="22" />
                     </w:rPr>
-                    <w:t id="TODAYDATE">08/02/2018</w:t>
+                    <w:t id="TODAYDATE">08/03/2018</w:t>
                   </w:r>
                   <w:bookmarkStart w:id="0" w:name="_GoBack" />
                   <w:bookmarkEnd w:id="0" />
@@ -1455,7 +1455,7 @@
                       <w:sz w:val="20" />
                       <w:szCs w:val="20" />
                     </w:rPr>
-                    <w:t id="PHOTO">0 kWDC</w:t>
+                    <w:t id="PHOTO">2 kWdc</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -1570,7 +1570,7 @@
                       <w:sz w:val="20" />
                       <w:u w:val="none" />
                     </w:rPr>
-                    <w:t>WALLTYPE</w:t>
+                    <w:t id="WALLTYPE">Synthetic</w:t>
                   </w:r>
                   <w:r>
                     <w:rPr>
@@ -1679,7 +1679,7 @@
                       <w:bCs />
                       <w:sz w:val="20" />
                     </w:rPr>
-                    <w:t id="FILENAME">KH1170RR</w:t>
+                    <w:t id="FILENAME">KH1170RR22</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -1746,7 +1746,7 @@
                       <w:bCs />
                       <w:sz w:val="20" />
                     </w:rPr>
-                    <w:t id="SQFT">1170</w:t>
+                    <w:t id="SQFT">2340</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -1811,7 +1811,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="ABVP">13.1</w:t>
+                    <w:t id="ABVP">12.6%</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -1878,7 +1878,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="COOLP">Placeholder</w:t>
+                    <w:t id="COOLP">-38.3%</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2018,7 +2018,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="GLAZINGP">0.152194%</w:t>
+                    <w:t id="GLAZINGP">21.7%</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2124,7 +2124,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="ROOFMAT">Asphalt / Tile</w:t>
+                    <w:t id="ROOFMAT">Asphalt</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2254,7 +2254,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="ATTIC">Placeholder</w:t>
+                    <w:t id="ATTIC">R-38</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2314,7 +2314,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="ABVRD">Placeholder</w:t>
+                    <w:t id="ABVRD">-</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2374,7 +2374,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="BLWRD">1</w:t>
+                    <w:t id="BLWRD">R 18</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2438,7 +2438,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="RADIENT">Placeholder</w:t>
+                    <w:t id="RADIENT">Yes</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2498,7 +2498,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="WALL24">Placeholder</w:t>
+                    <w:t id="WALL24">R-15 / R-13</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2558,7 +2558,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="WALL26">Placeholder</w:t>
+                    <w:t id="WALL26">R-21 / R-19</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2618,7 +2618,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="KNEEWALL">Placeholder</w:t>
+                    <w:t id="KNEEWALL">R-21 / R-15</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2678,7 +2678,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="OVERG">Placeholder</w:t>
+                    <w:t id="OVERG">R-19</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2744,7 +2744,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="FLOORTYPE">Placeholder</w:t>
+                    <w:t id="FLOORTYPE">Slab / Raised Floor</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2844,7 +2844,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="SEEREER">14 / 12.5</w:t>
+                    <w:t id="SEEREER">16 / 13.5</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -2964,7 +2964,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="DUCTINS">Placeholder</w:t>
+                    <w:t id="DUCTINS">R-8</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -3412,7 +3412,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="REFCHARGE">Placeholder</w:t>
+                    <w:t id="REFCHARGE">Yes</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -3475,7 +3475,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="SEERVERIF">Placeholder</w:t>
+                    <w:t id="SEERVERIF">Yes</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -3538,7 +3538,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="EERVERIF">Placeholder</w:t>
+                    <w:t id="EERVERIF">Yes</w:t>
                   </w:r>
                 </w:p>
               </w:tc>
@@ -3727,7 +3727,7 @@
                       <w:sz w:val="18" />
                       <w:szCs w:val="18" />
                     </w:rPr>
-                    <w:t id="LOWLEAK">Placeholder</w:t>
+                    <w:t id="LOWLEAK">Yes</w:t>
                   </w:r>
                 </w:p>
               </w:tc>

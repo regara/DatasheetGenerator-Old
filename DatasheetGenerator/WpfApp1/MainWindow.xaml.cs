@@ -74,27 +74,56 @@ namespace WpfApp1
             string _name = DryPath(userInput, "Name");
             string _city = DryPath(userInput, "City");
             string _climateZone = DryPath(userInput, "ClimateZone").Split(' ')[0].Substring(2,2);
-            string _aboveCodePerc =  DryPath(standard.Elements("EUseSummary"), "PctSavingsCmpTDV");
-            //            string _coolingImprove = DryPath(standard, );
-
-
-
-
-
-
-
+            string _aboveCodePerc =  DryPath(standard.Elements("EUseSummary"), "PctSavingsCmpTDV") + "%";
+            string _spaceCool = Math.Round(Convert.ToDouble(standard.Elements("EnergyUse").SingleOrDefault(x => x.Element("Name").Value == "EU-SpcClg").Elements("PctImproveTDV").SingleOrDefault().Value), 1) + "%";
 
 
             /*********************** ATTIC ***********************/
 
-            //            roofing = proj.Elements("Cons")[].Elements("RoofingLayer"),
-
-            //          var proposed 
-
             List<string> wallNames = new List<string>();
             List<string> wallMatArr = new List<string>();
-            string _roofMatFormated;
+            List<string> abvDeckArr = new List<string>();
+            List<string> blwDeckArr = new List<string>();
+            List<string> atticFloorArr = new List<string>();
+            List<string> wallInsulArr = new List<string>();
+            List<string> kneeWallArr = new List<string>();
+            List<string> floorOvrGarArr = new List<string>();
+            List<string> sidingOrStuccoArr = new List<string>();
 
+            string _roofMatFormated;
+            string _radientBarrier = "N/A";
+            string _abvRoofDeck = "";
+            string _blwRoofDeck = "";
+            string _atticFloor = "";
+            string _wallInsul24 = "-";
+            string _wallInsul26 = "-";
+            string _kneeWall = "-";
+            string _floorOvrGar = "-";
+            string _floorType = "";
+            string _sidingOrStucco = "";
+
+
+
+            if (userInput.Elements("Zone").Elements("SlabFloor").Count() > 0)
+                _floorType = "Slab";
+            if (userInput.Elements("Zone").Elements("FloorOverCrawl").Count() > 0)
+            {
+                if (_floorType != "")
+                    _floorType += " / ";
+                _floorType += "Raised Floor";
+            }
+
+            
+
+
+
+
+            foreach (var atticFloor in userInput.Elements("Zone").Elements("CeilingBelowAttic"))
+            {
+                var temp = atticFloor.Element("Construction");
+                if (!atticFloorArr.Contains(temp.Value.Split(' ')[0]) && temp.Value != "R-19 Attic Roof")
+                    atticFloorArr.Add(temp.Value.Split(' ')[0]);
+            }
 
 
             foreach (var ceil in wallNamePath)
@@ -106,9 +135,13 @@ namespace WpfApp1
 
             foreach (var roofingMat in wallNames)
             {
-                var tempRoofLayer = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat).Element("RoofingLayer").Value;
+                var roofTypePath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat).Element("RoofingLayer").Value;
+                var radientBarrierPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat).Element("RadiantBarrier").Value;
+                var aboveRoofDeckPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat).Element("AbvDeckInsulLayer").Value;
+                var belowRoofDeckPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat).Element("CavityLayer").Value;
 
-                switch (tempRoofLayer)
+
+                switch (roofTypePath)
                 {
                     case "Light Roof (Asphalt Shingle)":
                         wallMatArr.Add("Asphalt");
@@ -132,9 +165,116 @@ namespace WpfApp1
                         wallMatArr.Add("??????");
                         break;
 
-                }                
+                }
+
+                if (radientBarrierPath == "1")
+                    _radientBarrier = "Yes";
+
+                if (!abvDeckArr.Contains(aboveRoofDeckPath) && aboveRoofDeckPath != "- no insulation -")
+                    abvDeckArr.Add(aboveRoofDeckPath);
+
+
+
+                if (!blwDeckArr.Contains(belowRoofDeckPath) && belowRoofDeckPath != "- no insulation -")
+                    blwDeckArr.Add(belowRoofDeckPath);
             }
+
+            foreach (var zone in userInput.Elements("Zone"))
+            {
+                foreach (var wall in zone.Elements("ExtWall"))
+                {
+                    if (!wallInsulArr.Contains(wall.Element("Construction").Value))
+                    {
+                        wallInsulArr.Add(wall.Element("Construction").Value);
+
+                        if (Convert.ToInt32(wall.Element("Construction").Value.Split(' ')[0].Split('-')[1]) <= 15)
+                        {
+                            if (_wallInsul24.Length == 1)
+                                _wallInsul24 = "";
+                            if (_wallInsul24.Length > 1)
+                                _wallInsul24 += " / ";
+
+                            _wallInsul24 += wall.Element("Construction").Value.Split(' ')[0];
+                            if (wall.Element("Construction").Value.Split(' ')[0].Split('-').Last().Contains("R"))
+                                _wallInsul24 += wall.Element("Construction").Value.Split(' ')[0].Split('-').Last();
+                        }
+                        else
+                        {
+                            if (_wallInsul26.Length == 1)
+                                _wallInsul26 = "";
+                            if (_wallInsul26.Length > 1)
+                                _wallInsul26 += " / ";
+
+                            _wallInsul26 += wall.Element("Construction").Value.Split(' ')[0];
+                            if (wall.Element("Construction").Value.Split(' ')[0].Split('-').Last().Contains("R"))
+                                _wallInsul26 += wall.Element("Construction").Value.Split(' ')[0].Split('-').Last();
+                        }
+                    }
+
+                    foreach (var wallI in zone.Elements("IntWall"))
+                    {
+                        if (!kneeWallArr.Contains(wallI.Element("Construction").Value.Split(' ')[0]))
+                            kneeWallArr.Add(wallI.Element("Construction").Value.Split(' ')[0]);
+                    }
+
+                    foreach (var floor in zone.Elements("InteriorFloor"))
+                    {
+                        if (!floorOvrGarArr.Contains(floor.Element("Construction").Value.Split(' ')[0]))
+                            floorOvrGarArr.Add(floor.Element("Construction").Value.Split(' ')[0]);
+                    }
+                }
+            }
+
+            foreach (var wallt in wallInsulArr)
+            {
+                var tempPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == wallt)
+                    .Element("WallExtFinishLayer").Value;
+                if (!sidingOrStuccoArr.Contains(tempPath))
+                {
+                    sidingOrStuccoArr.Add(tempPath);
+
+
+                    switch (tempPath)
+                    {
+                        case "Synthetic Stucco":
+                            _sidingOrStucco += "Synthetic";
+                            break;
+                        case "3 Coat Stucco":
+                            _sidingOrStucco += "3-Coat";
+                            break;
+                        case "Wood Siding/sheathing/decking":
+                            _sidingOrStucco += "Siding/Sheathing";
+                            break;
+                        default:
+                            _sidingOrStucco += "Unknown Type";
+                            break;
+                    }
+                }
+
+                
+            }
+
+
+
+
+
+
+                if (abvDeckArr.Count == 0)
+                _abvRoofDeck = "-";
+            else
+                _abvRoofDeck = String.Join(" / ", abvDeckArr);
+
+            if (blwDeckArr.Count == 0)
+                _blwRoofDeck = "-";
+            else
+                _blwRoofDeck = String.Join(" / ", blwDeckArr);
+
             _roofMatFormated = String.Join(" / ", wallMatArr);
+            _atticFloor = String.Join(" / ", atticFloorArr);
+            _kneeWall = String.Join(" / ", kneeWallArr);
+            _floorOvrGar = String.Join(" / ", floorOvrGarArr);
+
+
 
             /*********************** WINDOWS ***********************/
 
@@ -170,40 +310,6 @@ namespace WpfApp1
             List<string> wallValues = new List<string>();
             List<string> wallType = new List<string>();
 
-//            foreach (var extwall in wallPath)
-//            {
-//                if (!wallValues.Contains(Convert.ToString(extwall.Element("Construction"))))
-//
-//                    wallValues.Add(Convert.ToString(extwall.Element("Construction")));
-//            }
-//
-//            foreach (string wallFinish in wallType)
-//            {
-//                if (!wallType.Contains(Convert.ToString(extwall.Element("Construction"))))
-//                {
-//                    //    LEFT OFF HERE - 4Each val in array check every cons.child(name.value = arrVal)                doc.Descendants("Model").Take(1).Descendants("Cons");
-//                }
-//
-//            }
-
-
-
-            foreach (string wallt in wallValues)
-            {
-                Console.WriteLine(wallt);
-                Console.WriteLine(wallt);
-
-            }
-
-            foreach (string wallt in wallType)
-            {
-                Console.WriteLine(wallt);
-                Console.WriteLine(wallt);
-
-            }
-
-            //            wallCoatType = "IN THE CONSTRUCT FOR EACH WALL",
-
 
 
             /*********************** PLACEHOLDER ***********************/
@@ -217,38 +323,34 @@ namespace WpfApp1
                             select new
 
                             {
-                                photovoltaic = proj.Element("PVMinRatedPwrRpt").Value + " kWDC",
+                                photovoltaic = proj.Element("PVMinRatedPwrRpt").Value,
                                 hERSIndex = "????",
                                 planStucco = proj.Element("Name").Value,
                                 fileName = proj.Element("ModelFile").Value,
                                 squareFeet = proj.Element("CondFloorArea").Value,
                                 stories = proj.Element("NumStories").Value,
-                                glazing = proj.Element("CondWinAreaCFARat").Value + "%",
+                                glazing = Math.Round(Convert.ToDouble(proj.Element("CondWinAreaCFARat").Value),3) + "%",
 
 
-
+   
                                 reflectEmiss = proj.Elements("Attic").First().Element("RoofSolReflect").Value + " / " + proj.Elements("Attic").First().Element("RoofEmiss").Value,
-                                roofingVal = "",
-                                //                  Leave out unless can append xml appropriatly        atticAboveD = proj.Elements("Attic").First().Element("AboveDeckRoofIns").Value,
-                                atticBelowD = proj.Elements("Attic").First().Element("BelowDeckRoofIns").Value,
-                                radientBar = "",
                                 kneeWall = "",
                                 floorOverhang = "",
                                 floorType = "",
                                 seerEer = proj.Element("SCSysRpt").Element("MinCoolSEER").Value + " / " + proj.Element("SCSysRpt").Element("MinCoolEER").Value,
                                 afue = "",
-                                ductInsul = "",
+                                ductInsul = proj.Element("SCSysRpt").Element("MinDistribInsRval").Value,
                                 wholeHouseFan = "",
                                 fanWattage = "",
                                 airflow = "",
                                 ductTestingReq = "",
                                 indoorAirQual = "",
-                                refCharg = "",
-                                seerVerif = "", //zone.HVACSysAssigned
-                                eerVerif = "",
+                                refCharg = proj.Element("SCSysRpt").Element("HERSACCharg").Value,
+                                seerVerif = proj.Element("SCSysRpt").Element("HERSSEER").Value,
+                                eerVerif = proj.Element("SCSysRpt").Element("HERSEER").Value,
                                 infiltration = "",
                                 ductInConditioned = "",
-                                lowLeakageAir = "",
+                                lowLeakageAir = proj.Element("SCSysRpt").Element("LLAHUStatus").Value,
                                 burriedDuct = "",
                                 surfaceArea = "",
                                 insulInspect = "",
@@ -343,40 +445,41 @@ namespace WpfApp1
             datasheetCreator("PROJECTNAME", _name);
             datasheetCreator("CITY", _city);
             datasheetCreator("CLIMATEZONE", _climateZone);
-            datasheetCreator("PHOTO", property.photovoltaic);
+            datasheetCreator("PHOTO", (property.photovoltaic == "0") ? "N/A" : property.photovoltaic + " kWdc");
             datasheetCreator("HERS", property.hERSIndex);
+            datasheetCreator("WALLTYPE", _sidingOrStucco);
             datasheetCreator("PLANNAME", _name);
             datasheetCreator("FILENAME", property.fileName);
             datasheetCreator("SQFT", property.squareFeet);
             datasheetCreator("ABVP", _aboveCodePerc);
-            datasheetCreator("COOLP", "Placeholder");
+            datasheetCreator("COOLP", _spaceCool);
             datasheetCreator("STORIES", property.stories);
-            datasheetCreator("GLAZINGP", property.glazing);
+            datasheetCreator("GLAZINGP", property.glazing.Split('.')[1].Insert(2, "."));
             datasheetCreator("ROOFMAT", _roofMatFormated);
             datasheetCreator("REFEM", property.reflectEmiss);
-            datasheetCreator("ATTIC", "Placeholder");
-            datasheetCreator("ABVRD", "Placeholder");
-            datasheetCreator("BLWRD", property.atticBelowD);
-            datasheetCreator("RADIENT", "Placeholder");
-            datasheetCreator("WALL24", "Placeholder");
-            datasheetCreator("WALL26", "Placeholder");
-            datasheetCreator("KNEEWALL", "Placeholder");
-            datasheetCreator("OVERG", "Placeholder");
-            datasheetCreator("FLOORTYPE", "Placeholder");
+            datasheetCreator("ATTIC", _atticFloor);
+            datasheetCreator("ABVRD", _abvRoofDeck);
+            datasheetCreator("BLWRD", _blwRoofDeck);
+            datasheetCreator("RADIENT", _radientBarrier);
+            datasheetCreator("WALL24", _wallInsul24);
+            datasheetCreator("WALL26", _wallInsul26);
+            datasheetCreator("KNEEWALL", _kneeWall);
+            datasheetCreator("OVERG", _floorOvrGar);
+            datasheetCreator("FLOORTYPE", _floorType);
             datasheetCreator("SEEREER", property.seerEer);
             datasheetCreator("AFUE", "Placeholder");
-            datasheetCreator("DUCTINS", "Placeholder");
+            datasheetCreator("DUCTINS", "R-" + property.ductInsul);
             datasheetCreator("WHF", "Placeholder");
             datasheetCreator("FANWAT", "Placeholder");
             datasheetCreator("AIRFLOW", "Placeholder");
             datasheetCreator("DUCTTEST", "Placeholder");
             datasheetCreator("CFM", "Placeholder");
-            datasheetCreator("REFCHARGE", "Placeholder");
-            datasheetCreator("SEERVERIF", "Placeholder");
-            datasheetCreator("EERVERIF", "Placeholder");
+            datasheetCreator("REFCHARGE", (property.refCharg == "1") ? "Yes" : "-");
+            datasheetCreator("SEERVERIF", (property.seerVerif == "1") ? "Yes" : "-");
+            datasheetCreator("EERVERIF", (property.eerVerif == "1") ? "Yes" : "-");
             datasheetCreator("INFILTRATION", "Placeholder");
             datasheetCreator("DUCTCOND", "Placeholder");
-            datasheetCreator("LOWLEAK", "Placeholder");
+            datasheetCreator("LOWLEAK", (property.lowLeakageAir == "Has Low Leakage Air Handler") ? "Yes" : "-");
             datasheetCreator("BURRIEDDUCT", "Placeholder");
             datasheetCreator("SURFAREA", "Placeholder");
             datasheetCreator("INSULINSPECT", "Placeholder");
