@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,6 +30,7 @@ namespace WpfApp1
             InitializeComponent();
         }
 
+        
 
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
@@ -47,12 +49,11 @@ namespace WpfApp1
             string s = cbeccxml.FileName;
             XDocument doc = XDocument.Load(s);
 
-
             /*********************** DRY PATH METHOD ***********************/
 
             string DryPath(IEnumerable<XElement> path, XName element)
             {
-                return Convert.ToString(path.Elements(element).First().Value);
+                return Convert.ToString(path.Elements(element).FirstOrDefault()?.Value);
             }
 
             /*********************** XMLNODE - PATHS ***********************/
@@ -69,15 +70,17 @@ namespace WpfApp1
 
             /*********************** Misc General Data ***********************/
 
-            string[] _softversionTemp = Convert.ToString(userInput.Elements("SoftwareVersion").First()).Split(' ')[1].Split('.');
+            string[] _softversionTemp = Convert.ToString(userInput.Elements("SoftwareVersion").First().Value).Split(' ')[1].Split('.');
             string _softversion = "CBECC V" + _softversionTemp[1] +"."+ _softversionTemp[2];
-
 
             string _name = DryPath(userInput, "Name");
             string _city = DryPath(userInput, "City");
-            string _climateZone = DryPath(userInput, "ClimateZone").Split(' ')[0].Substring(2,2);
-            string _aboveCodePerc =  DryPath(standard.Elements("EUseSummary"), "PctSavingsCmpTDV") + "%";
-            string _spaceCool = Math.Round(Convert.ToDouble(standard.Elements("EnergyUse").SingleOrDefault(x => x.Element("Name").Value == "EU-SpcClg").Elements("PctImproveTDV").SingleOrDefault().Value), 1) + "%";
+
+            string _climateZone = DryPath(userInput, "ClimateZone").Split(' ')[0].Split('Z')[1];
+
+            string _aboveCodePerc =  DryPath(standard.Elements("EUseSummary"), "PctSavingsCmpTDV");
+
+            string _spaceCool = Math.Round(Convert.ToDouble(standard.Elements("EnergyUse").SingleOrDefault(x => x.Element("Name").Value == "EU-SpcClg")?.Elements("PctImproveTDV").SingleOrDefault().Value), 1) + "%";
 
 
             /*********************** ATTIC ***********************/
@@ -105,12 +108,12 @@ namespace WpfApp1
             string _floorOvrGar = "-";
             string _floorType = "";
             string _sidingOrStucco = "";
-            string _indoorAirQual = doc.Descendants("Model").Skip(1).Take(1).Elements("IAQVentRpt").SingleOrDefault().Element("IAQCFM").Value;
-            string _insulConsQual = userInput.Elements("InsulConsQuality").SingleOrDefault().Value;
-            string _airLeakage = userInput.Elements("ACH50").SingleOrDefault().Value;
+            string _indoorAirQual = doc.Descendants("Model").Skip(1).Take(1).Elements("IAQVentRpt").SingleOrDefault()?.Element("IAQCFM")?.Value;
+            string _insulConsQual = userInput.Elements("InsulConsQuality").SingleOrDefault()?.Value;
+            string _airLeakage = userInput.Elements("ACH50").SingleOrDefault()?.Value;
             string _buriedDuct = "-";
             string _waterHeater = "";
-            string _Qii = doc.Descendants("Model").Skip(1).Take(1).Single().Element("HERSOther").Element("QII").Value;
+            string _Qii = doc.Descendants("Model").Skip(1).Take(1).Single()?.Element("HERSOther")?.Element("QII")?.Value;
 
             if (userInput.Elements("Zone").Elements("SlabFloor").Count() > 0)
                 _floorType = "Slab";
@@ -123,12 +126,12 @@ namespace WpfApp1
 
 
 
-
             foreach (var buriedDucts in doc.Descendants("Model").Take(1).Elements("HVACSys"))
             {
-                var temp = buriedDucts.Element("DistribSystem").Value;
 
-                if (doc.Descendants("Model").Take(1).Elements("HVACDist").SingleOrDefault(x => x.Element("Name").Value == temp).Element("AreBuried").Value == "1")
+                var temp = buriedDucts.Element("DistribSystem")?.Value;
+
+                if (doc.Descendants("Model").Take(1)?.Elements("HVACDist").SingleOrDefault(x => x.Element("Name").Value == temp)?.Element("AreBuried")?.Value == "1")
                 {
                     _buriedDuct = "Yes";
                     break;
@@ -137,8 +140,8 @@ namespace WpfApp1
 
             foreach (var waterHeater in doc.Descendants("Model").Take(1).Elements("DHWSys"))
             {
-                var temp = waterHeater.Element("DHWHeater").Value;
-                var temp2 = doc.Descendants("Model").Take(1).Elements("DHWHeater").SingleOrDefault(x => x.Element("Name").Value == temp);
+                var temp = waterHeater.Element("DHWHeater")?.Value;
+                var temp2 = doc.Descendants("Model").Take(1).Elements("DHWHeater").SingleOrDefault(x => x.Element("Name")?.Value == temp);
 
                 if (!waterHeaterArr.Contains(temp))
                 {
@@ -146,9 +149,9 @@ namespace WpfApp1
                         _waterHeater += " + ";
 
                     waterHeaterArr.Add(temp);
-                    if (temp2.Element("EnergyFactor").Value.Split('.').ToList().ElementAt(1).Length == 1)
+                    if (temp2.Element("EnergyFactor")?.Value.Split('.').ToList().ElementAt(1)?.Length == 1)
                         temp2.Element("EnergyFactor").Value += "0";
-                    _waterHeater += temp2.Element("EnergyFactor").Value + "(" + temp2.Element("TankVolume").Value +") ";
+                    _waterHeater += temp2.Element("EnergyFactor")?.Value + "(" + temp2.Element("TankVolume")?.Value +") ";
                 }
             }
 
@@ -165,15 +168,15 @@ namespace WpfApp1
             {
                 if (!wallNames.Contains(Convert.ToString(ceil.Elements("Construction"))) &&
                    (string) ceil.Element("Construction") != "Attic Roof Garage")
-                       wallNames.Add(Convert.ToString(ceil.Element("Construction").Value));
+                       wallNames.Add(Convert.ToString(ceil.Element("Construction")?.Value));
             }
 
             foreach (var roofingMat in wallNames)
             {
-                var roofTypePath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat).Element("RoofingLayer").Value;
-                var radientBarrierPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat).Element("RadiantBarrier").Value;
-                var aboveRoofDeckPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat).Element("AbvDeckInsulLayer").Value;
-                var belowRoofDeckPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat).Element("CavityLayer").Value;
+                var roofTypePath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat)?.Element("RoofingLayer")?.Value;
+                var radientBarrierPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat)?.Element("RadiantBarrier")?.Value;
+                var aboveRoofDeckPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat)?.Element("AbvDeckInsulLayer")?.Value;
+                var belowRoofDeckPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat)?.Element("CavityLayer" )?.Value;
 
 
                 switch (roofTypePath)
@@ -220,33 +223,51 @@ namespace WpfApp1
                 {
                     if (!wallInsulArr.Contains(wall.Element("Construction").Value))
                     {
+
                         wallInsulArr.Add(wall.Element("Construction").Value);
 
-                        if (Convert.ToInt32(wall.Element("Construction").Value.Split(' ')[0].Split('-')[1]) <= 15)
+                        void WallFormater(string wallPathVal)
                         {
-                            if (_wallInsul24.Length == 1)
-                                _wallInsul24 = "";
-                            if (_wallInsul24.Length > 1)
-                                _wallInsul24 += " / ";
+                            string firstWordInString = wallPathVal.Split(' ')[0];
+                            string rVal = Regex.Split(firstWordInString, @"\D+")[1];
 
-                            _wallInsul24 += wall.Element("Construction").Value.Split(' ')[0];
-                            if (wall.Element("Construction").Value.Split(' ')[0].Split('-').Last().Contains("R"))
-                                _wallInsul24 += wall.Element("Construction").Value.Split(' ')[0].Split('-').Last();
-                        }
-                        else
-                        {
-                            if (_wallInsul26.Length == 1)
-                                _wallInsul26 = "";
-                            if (_wallInsul26.Length > 1)
-                                _wallInsul26 += " / ";
+                            if (firstWordInString == "existing")
+                            {
+                                //ignore?
+                            } else if (Convert.ToInt32(rVal) <= 15)
+                            {
 
-                            _wallInsul26 += wall.Element("Construction").Value.Split(' ')[0];
-                            if (wall.Element("Construction").Value.Split(' ')[0].Split('-').Last().Contains("R"))
-                                _wallInsul26 += wall.Element("Construction").Value.Split(' ')[0].Split('-').Last();
+                                if (_wallInsul24.Length == 1)
+                                    _wallInsul24 = "";
+
+                                if (!_wallInsul24.Contains(firstWordInString))
+                                {
+                                    if (_wallInsul24.Length > 1)
+                                       _wallInsul24 += " / ";
+
+                                    _wallInsul24 += firstWordInString;
+                                    if (wall.Element("Construction").Value.Split(' ').Last().Contains("R"))
+                                    _wallInsul24 += wall.Element("Construction").Value.Split(' ')[0].Split('-').Last();
+                                }
+                            }
+                            else
+                            {
+                                if (_wallInsul26.Length == 1)
+                                   _wallInsul26 = "";
+
+                                if (!_wallInsul26.Contains(firstWordInString))
+                                {
+                                    if (_wallInsul26.Length > 1)
+                                       _wallInsul26 += " / ";
+
+                                    _wallInsul26 += firstWordInString;
+                                    if (wall.Element("Construction").Value.Split(' ').Last().Contains("R"))
+                                        _wallInsul26 += wall.Element("Construction").Value.Split(' ')[0].Split('-').Last();
+                                }
+                            }
                         }
+                        WallFormater(wall.Element("Construction").Value);
                     }
-
-                    
 
                     foreach (var wallI in zone.Elements("IntWall"))
                     {
@@ -264,7 +285,7 @@ namespace WpfApp1
 
             foreach (var wallt in wallInsulArr)
             {
-                var tempPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == wallt)
+                var tempPath = roofMatPath.SingleOrDefault(x => x.Element("Name")?.Value == wallt)
                     .Element("WallExtFinishLayer").Value;
                 if (!sidingOrStuccoArr.Contains(tempPath))
                 {
@@ -291,12 +312,7 @@ namespace WpfApp1
                 
             }
 
-
-
-
-
-
-                if (abvDeckArr.Count == 0)
+            if (abvDeckArr.Count == 0)
                 _abvRoofDeck = "-";
             else
                 _abvRoofDeck = String.Join(" / ", abvDeckArr);
@@ -311,12 +327,7 @@ namespace WpfApp1
             _kneeWall = String.Join(" / ", kneeWallArr);
             _floorOvrGar = String.Join(" / ", floorOvrGarArr);
 
-
-
-
-
-
-            _wallInsul24 = string.Join(" / ", _wallInsul26.Split('/').Distinct().OrderBy(x => x));
+            _wallInsul24 = string.Join(" / ", _wallInsul24.Split('/').Distinct().OrderBy(x => x));
             _wallInsul26 = string.Join(" / ", _wallInsul26.Split('/').Distinct().OrderBy(x => x));
             _kneeWall = string.Join(" / ", _kneeWall.Split('/').Distinct().OrderBy(x => x));
 
@@ -327,36 +338,26 @@ namespace WpfApp1
             List<string> windowsSHGC = new List<string>();
             List<string> windowTypes = new List<string>();
 
-
-
             foreach (var zones in proposed.Elements("Zone"))
             {
                 foreach (var walls in zones.Elements("ExtWall"))
                 {
+                    
                     foreach (var windows in walls.Elements("Win"))
                     {
-                        if (!windowsUV.Contains(windows.Element("NFRCUfactor").Value) ||
-                            !windowsSHGC.Contains(windows.Element("NFRCSHGC").Value) ||
-                            !windowTypes.Contains(windows.Element("WinType").Value))
+                        if (!windowsUV.Contains(windows.Element("NFRCUfactor")?.Value) ||
+                            !windowsSHGC.Contains(windows.Element("NFRCSHGC")?.Value) ||
+                            !windowTypes.Contains(windows.Element("WinType")?.Value))
                         {
-                            windowsUV.Add(windows.Element("NFRCUfactor").Value);
-                            windowsSHGC.Add(windows.Element("NFRCSHGC").Value);
-                            windowTypes.Add(windows.Element("WinType").Value);
+
+                            windowsUV.Add(windows.Element("NFRCUfactor")?.Value);
+                            windowsSHGC.Add(windows.Element("NFRCSHGC")?.Value);
+                            windowTypes.Add(windows.Element("WinType")?.Value);
+
                         }
                     }
                 }
             }
-
-
-
-
-
-            /*********************** Wall ***********************/
-
-            List<string> wallValues = new List<string>();
-            List<string> wallType = new List<string>();
-
-
 
             /*********************** PLACEHOLDER ***********************/
 
@@ -376,15 +377,9 @@ namespace WpfApp1
             if (_wholeHouseFan == "Yes ( )")
                 _wholeHouseFan = "-";
 
-
-
-
-
-
             var property = (from p in doc.Descendants("Model").Where(n => (string)n.Attribute("Name") == "Proposed")
                             let proj = p.Element("Proj")
                             select new
-
                             {
                                 photovoltaic = proj.Element("PVMinRatedPwrRpt").Value,
                                 hERSIndex = "????",
@@ -392,118 +387,48 @@ namespace WpfApp1
                                 fileName = proj.Element("ModelFile").Value,
                                 squareFeet = proj.Element("CondFloorArea").Value,
                                 stories = proj.Element("NumStories").Value,
-                                glazing = Math.Round(Convert.ToDouble(proj.Element("CondWinAreaCFARat").Value),3) + "%",
+                                glazing = Math.Round(Convert.ToDouble(proj.Element("CondWinAreaCFARat").Value), 3),
 
 
-   
-                                reflectEmiss = proj.Elements("Attic").First().Element("RoofSolReflect").Value + " / " + proj.Elements("Attic").First().Element("RoofEmiss").Value,
+
+                                reflectEmiss = proj.Elements("Attic")?.FirstOrDefault()?.Element("RoofSolReflect").Value + " / " + proj.Elements("Attic")?.FirstOrDefault()?.Element("RoofEmiss").Value,
                                 kneeWall = "",
                                 floorOverhang = "",
                                 floorType = "",
-                                seerEer = proj.Element("SCSysRpt").Element("MinCoolSEER").Value + " / " + proj.Element("SCSysRpt").Element("MinCoolEER").Value,
-                                afue = proj.Element("SCSysRpt").Element("MinHeatEffic").Value,
-                                ductInsul = proj.Element("SCSysRpt").Element("MinDistribInsRval").Value,
-                                fanWattage = proj.Element("SCSysRpt").Element("HERSFanEff").Value,
-                                airflow = proj.Element("SCSysRpt").Element("HERSAHUAirFlow").Value,
-                                airflowVal = proj.Element("SCSysRpt").Element("MinCoolCFMperTon").Value,
-                                ductTestingReq = proj.Element("SCSysRpt").Element("HERSDuctLeakage").Value,
-                                ductTestingVal = proj.Element("SCSysRpt").Element("HERSDuctLkgRptMsg").Value,
+                                seerEer = proj.Element("SCSysRpt")?.Element("MinCoolSEER")?.Value + " / " + proj.Element("SCSysRpt")?.Element("MinCoolEER")?.Value,
+                                afue = proj.Element("SCSysRpt")?.Element("MinHeatEffic")?.Value,
+                                ductInsul = proj.Element("SCSysRpt")?.Element("MinDistribInsRval")?.Value,
+                                fanWattage = proj.Element("SCSysRpt")?.Element("HERSFanEff")?.Value,
+                                airflow = proj.Element("SCSysRpt")?.Element("HERSAHUAirFlow")?.Value,
+                                airflowVal = proj.Element("SCSysRpt")?.Element("MinCoolCFMperTon")?.Value,
+                                ductTestingReq = proj.Element("SCSysRpt")?.Element("HERSDuctLeakage")?.Value,
+                                ductTestingVal = proj.Element("SCSysRpt")?.Element("HERSDuctLkgRptMsg")?.Value,
                                 indoorAirQual = "",
-                                refCharg = proj.Element("SCSysRpt").Element("HERSACCharg").Value,
-                                seerVerif = proj.Element("SCSysRpt").Element("HERSSEER").Value,
-                                eerVerif = proj.Element("SCSysRpt").Element("HERSEER").Value,
+                                refCharg = proj.Element("SCSysRpt")?.Element("HERSACCharg")?.Value,
+                                seerVerif = proj.Element("SCSysRpt")?.Element("HERSSEER")?.Value,
+                                eerVerif = proj.Element("SCSysRpt")?.Element("HERSEER")?.Value,
                                 infiltration = "",
                                 ductInConditioned = "",
-                                lowLeakageAir = proj.Element("SCSysRpt").Element("LLAHUStatus").Value,
+                                lowLeakageAir = proj.Element("SCSysRpt")?.Element("LLAHUStatus")?.Value,
                                 surfaceArea = "",
                                 insulInspect = "",
-                                fuelType = proj.Element("GasType").Value,
-
-                                //      Get value of each proj.<DHWSys> as WH Then search for proj.<DHWHeater> with a child <name>.value = WH
-                                //                    waterHeater = proj.Element("DHWHeater").Element("EnergyFactor").Value,
+                                fuelType = proj.Element("GasType")?.Value,
 
                                 distribution = "Standard"
                             }).SingleOrDefault();
 
-
-
-
-
-
             List<string> result = Convert.ToString(property).Split(',').ToList();
 
-            foreach (var prop in result)
-            {
-                //                            var props = prop.Split('='); ***** if theres an extra row, it will be hard to tell visually if you remove the key
-                //                            Console.WriteLine(props[1]);
-
-                //                            Console.WriteLine(prop);
-
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//            XDocument xmlFile = XDocument.Load("XMLTemplates/Test.xml");
-//            var query = from c in xmlFile.Elements("catalog").Elements("book")
-//                        select c;
-//            foreach (XElement book in query)
-//            {
-//                book.Attribute("attr1").Value = "MyNewValue";
-//            }
-//            xmlFile.Save("books.xml");
-//
-//
-//
-//
-//
-////            var nodec = xmlDocument.SelectSingleNode("//*[@id='10001']");
-////            Console.WriteLine(nodec.InnerText);
-//            
-//
-//
-
             XmlDocument datasheet = new XmlDocument();
-//            datasheet.Load(@"..\..\XMLTemplates\2016 Datasheet - 1 Column.xml");
 
-            datasheet.Load(@"XMLTemplates\2016 Datasheet - 1 Column.xml");
+          datasheet.Load(@"..\..\XMLTemplates\2016 Datasheet - 1 Column.xml");
+//            datasheet.Load(@"XMLTemplates\2016 Datasheet - 1 Column.xml");
 
 
             void datasheetCreator(string ID, string textToAppend)
             {
                 datasheet.SelectSingleNode("//*[@id='"+ ID + "']").InnerText = textToAppend;
             }
-
 
             datasheetCreator("TODAYDATE", DateTime.Now.ToString("MM/dd/yyyy"));
             datasheetCreator("SOFTVERSION", _softversion);
@@ -519,7 +444,7 @@ namespace WpfApp1
             datasheetCreator("ABVP", _aboveCodePerc);
             datasheetCreator("COOLP", _spaceCool);
             datasheetCreator("STORIES", property.stories);
-            datasheetCreator("GLAZINGP", property.glazing.Split('.')[1].Insert(2, "."));
+            datasheetCreator("GLAZINGP", (property.glazing == 0) ? "0.00%" : property.glazing.ToString().Split('.')?[1]?.Insert(2, ".") + "%");
             datasheetCreator("ROOFMAT", _roofMatFormated);
             datasheetCreator("REFEM", property.reflectEmiss);
             datasheetCreator("ATTIC", _atticFloor);
@@ -551,34 +476,26 @@ namespace WpfApp1
             datasheetCreator("FUELTYPE", property.fuelType);
             datasheetCreator("UEF", _waterHeater);
             datasheetCreator("DISTRIBUTION", property.distribution);
-
-
-
-
-
-            datasheetCreator("WIN1", (windowTypes[0] != null) ? windowTypes[0] : "");
-            datasheetCreator("WIN2", (windowTypes[1] != null) ? windowTypes[1] : "");
-            datasheetCreator("WIN3", (windowTypes[2] != null) ? windowTypes[2] : "");
-            datasheetCreator("WIN4", (windowTypes[3] != null) ? windowTypes[3] : "");
-
-            datasheetCreator("UVAL1", (windowsUV[0] != null) ? windowsUV[0] : "");
-            datasheetCreator("UVAL2", (windowsUV[1] != null) ? windowsUV[1] : "");
-            datasheetCreator("UVAL3", (windowsUV[2] != null) ? windowsUV[2] : "");
-            datasheetCreator("UVAL4", (windowsUV[3] != null) ? windowsUV[3] : "");
-
-            datasheetCreator("SHGC1", (windowsSHGC[0] != null) ? windowsSHGC[0] : "");
-            datasheetCreator("SHGC2", (windowsSHGC[1] != null) ? windowsSHGC[1] : "");
-            datasheetCreator("SHGC3", (windowsSHGC[2] != null) ? windowsSHGC[2] : "");
-            datasheetCreator("SHGC4", (windowsSHGC[3] != null) ? windowsSHGC[3] : "");
-
+           
+            datasheetCreator("WIN1", (windowTypes.ElementAtOrDefault(0) != null) ? windowTypes[0] : "");
+            datasheetCreator("WIN2", (windowTypes.ElementAtOrDefault(1) != null) ? windowTypes[1] : "");
+            datasheetCreator("WIN3", (windowTypes.ElementAtOrDefault(2) != null) ? windowTypes[2] : "");
+            datasheetCreator("WIN4", (windowTypes.ElementAtOrDefault(3) != null) ? windowTypes[3] : "");
+  
+           
+            datasheetCreator("UVAL1", (windowsUV.ElementAtOrDefault(0) != null) ? windowsUV[0] : "");
+            datasheetCreator("UVAL2", (windowsUV.ElementAtOrDefault(1) != null) ? windowsUV[1] : "");
+            datasheetCreator("UVAL3", (windowsUV.ElementAtOrDefault(2) != null) ? windowsUV[2] : "");
+            datasheetCreator("UVAL4", (windowsUV.ElementAtOrDefault(3) != null) ? windowsUV[3] : "");
 
             
-
-
+            datasheetCreator("SHGC1", (windowsSHGC.ElementAtOrDefault(0) != null) ? windowsSHGC[0] : "");
+            datasheetCreator("SHGC2", (windowsSHGC.ElementAtOrDefault(1) != null) ? windowsSHGC[1] : "");
+            datasheetCreator("SHGC3", (windowsSHGC.ElementAtOrDefault(2) != null) ? windowsSHGC[2] : "");
+            datasheetCreator("SHGC4", (windowsSHGC.ElementAtOrDefault(3) != null) ? windowsSHGC[3] : "");
+    
 
             datasheet.Save(_name + " - Datasheet.doc");
-
-
         }
     }
 }
