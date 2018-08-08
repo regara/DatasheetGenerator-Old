@@ -35,6 +35,7 @@ namespace WpfApp1
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
 
+
             /*********************** btn on click upload XML ***********************/
 
             OpenFileDialog cbeccxml = new OpenFileDialog
@@ -439,8 +440,8 @@ namespace WpfApp1
 
             XmlDocument datasheet = new XmlDocument();
 
-//          datasheet.Load(@"..\..\XMLTemplates\2016 Datasheet - 1 Column.xml");
-            datasheet.Load(@"XMLTemplates\2016 Datasheet - 1 Column.xml");
+
+            datasheet.LoadXml(Properties.Resources.Datasheet1);
 
 
             void datasheetCreator(string ID, string textToAppend)
@@ -511,9 +512,10 @@ namespace WpfApp1
             datasheetCreator("SHGC2", (windowsSHGC.ElementAtOrDefault(1) != null) ? windowsSHGC[1] : "");
             datasheetCreator("SHGC3", (windowsSHGC.ElementAtOrDefault(2) != null) ? windowsSHGC[2] : "");
             datasheetCreator("SHGC4", (windowsSHGC.ElementAtOrDefault(3) != null) ? windowsSHGC[3] : "");
-    
 
-            datasheet.Save(_name + " - Datasheet.doc");
+
+            
+             datasheet.Save(@"C:\Users\" + Environment.UserName + @"\Downloads\" + _name + " - Datasheet.doc");
         }
     }
 }

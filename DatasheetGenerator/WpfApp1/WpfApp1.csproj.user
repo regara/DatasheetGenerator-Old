@@ -2,8 +2,8 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectView>ShowAllFiles</ProjectView>
-    <PublishUrlHistory>P:\Software Builds\Datasheet Generator\|C:\Users\Public\|https://bitbucket.org/califlivingenergy/datasheetgenerator/raw/578ca2931be21a96ae325ca1e4882812fcdc3f9b/DatasheetGenerator/WpfApp1/|public\|https://CRogersCLE%40bitbucket.org/califlivingenergy/datasheetgenerator.git/</PublishUrlHistory>
-    <InstallUrlHistory>https://bitbucket.org/califlivingenergy/datasheetgenerator/raw/6877aff3b772f734b0d4d1292045cef2260f5499/DatasheetGenerator/WpfApp1/bin/Debug/WpfApp1.exe/|https://bitbucket.org/califlivingenergy/datasheetgenerator/raw/578ca2931be21a96ae325ca1e4882812fcdc3f9b/DatasheetGenerator/WpfApp1/</InstallUrlHistory>
+    <PublishUrlHistory>\\server02\d\personal\Software Builds\Datasheet Generator\|\\localhost\Program Files\Datasheet Generator\|\\localhost\c%24\Program Files\Datasheet Generator\|P:\Software Builds\Datasheet Generator\|C:\Users\Public\</PublishUrlHistory>
+    <InstallUrlHistory>\\server02\d\personal\Software Builds\Datasheet Generator\|\\localhost\Program Files\Datasheet Generator\|\\localhost\c%24\Program Files\Datasheet Generator\|\\server022\d\personal\Software Builds\Datasheet Generator\|https://bitbucket.org/califlivingenergy/datasheetgenerator/raw/6877aff3b772f734b0d4d1292045cef2260f5499/DatasheetGenerator/WpfApp1/bin/Debug/WpfApp1.exe/</InstallUrlHistory>
     <SupportUrlHistory />
     <UpdateUrlHistory />
     <BootstrapperUrlHistory />
