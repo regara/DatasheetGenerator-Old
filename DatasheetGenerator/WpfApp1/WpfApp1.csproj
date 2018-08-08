@@ -14,7 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>public\</PublishUrl>
+    <PublishUrl>P:\Software Builds\Datasheet Generator\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -24,8 +24,13 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://bitbucket.org/califlivingenergy/datasheetgenerator/raw/578ca2931be21a96ae325ca1e4882812fcdc3f9b/DatasheetGenerator/WpfApp1/</InstallUrl>
-    <ApplicationRevision>1</ApplicationRevision>
+    <InstallUrl>https://bitbucket.org/califlivingenergy/datasheetgenerator/raw/6877aff3b772f734b0d4d1292045cef2260f5499/DatasheetGenerator/WpfApp1/bin/Debug/WpfApp1.exe/</InstallUrl>
+    <ProductName>Datasheet Generator</ProductName>
+    <PublisherName>CLE IT</PublisherName>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPage>publish.htm</WebPage>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -70,6 +75,12 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>WpfApp1_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
