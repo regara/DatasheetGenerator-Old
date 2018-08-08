@@ -9,7 +9,7 @@
     <Grid>
         <DockPanel Margin="10">
         <WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Top" Margin="0,0,0,10">
-            <Button Name="btnOpenFile" Click="btnOpenFile_Click" >Open file</Button>
+            <Button Name="btnOpenFile" Click="btnOpenFile_Click" >TESTTTTT</Button>
         </WrapPanel>
         <TextBox Name="txtEditor" />
         </DockPanel>

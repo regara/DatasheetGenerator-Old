@@ -439,8 +439,8 @@ namespace WpfApp1
 
             XmlDocument datasheet = new XmlDocument();
 
-          datasheet.Load(@"..\..\XMLTemplates\2016 Datasheet - 1 Column.xml");
-//            datasheet.Load(@"XMLTemplates\2016 Datasheet - 1 Column.xml");
+//          datasheet.Load(@"..\..\XMLTemplates\2016 Datasheet - 1 Column.xml");
+            datasheet.Load(@"XMLTemplates\2016 Datasheet - 1 Column.xml");
 
 
             void datasheetCreator(string ID, string textToAppend)
