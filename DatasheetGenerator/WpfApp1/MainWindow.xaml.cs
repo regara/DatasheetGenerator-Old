@@ -77,12 +77,15 @@ namespace WpfApp1
             string _city = DryPath(userInput, "City");
 
             string _climateZone = DryPath(userInput, "ClimateZone").Split(' ')[0].Split('Z')[1];
-
-            string _aboveCodePerc =  DryPath(standard.Elements("EUseSummary"), "PctSavingsCmpTDV");
-
+            //            string _aboveCodePerc =  DryPath(standard.Elements("EUseSummary"), "PctSavingsCmpTDV");
+            string _aboveCodePerc = standard.Elements("EUseSummary").Elements("PctSavingsCmpTDV").FirstOrDefault()?.Value;
             string _spaceCool = Math.Round(Convert.ToDouble(standard.Elements("EnergyUse").SingleOrDefault(x => x.Element("Name").Value == "EU-SpcClg")?.Elements("PctImproveTDV").SingleOrDefault().Value), 1) + "%";
 
-
+            Console.WriteLine("abv ----" + _aboveCodePerc);
+            foreach (var VARIABLE in standard.Elements("EUseSummary"))
+            {
+                Console.WriteLine("Var + " + VARIABLE);
+            }
             /*********************** ATTIC ***********************/
 
             List<string> wallNames = new List<string>();
@@ -110,8 +113,10 @@ namespace WpfApp1
             string _sidingOrStucco = "";
             string _indoorAirQual = doc.Descendants("Model").Skip(1).Take(1).Elements("IAQVentRpt").SingleOrDefault()?.Element("IAQCFM")?.Value;
             string _insulConsQual = userInput.Elements("InsulConsQuality").SingleOrDefault()?.Value;
-            string _airLeakage = userInput.Elements("ACH50").SingleOrDefault()?.Value;
+            string _airLeakage = (userInput.Elements("ACH50").SingleOrDefault()?.Value.Length == 1) ? userInput.Elements("ACH50").SingleOrDefault()?.Value +".00%" : userInput.Elements("ACH50").SingleOrDefault()?.Value + "%";
             string _buriedDuct = "-";
+            string _surfaceArea = "-";
+            string _ductInConditioned = "-";
             string _waterHeater = "";
             string _Qii = doc.Descendants("Model").Skip(1).Take(1).Single()?.Element("HERSOther")?.Element("QII")?.Value;
 
@@ -130,10 +135,25 @@ namespace WpfApp1
             {
 
                 var temp = buriedDucts.Element("DistribSystem")?.Value;
+                var query = doc.Descendants("Model").Take(1)?.Elements("HVACDist").SingleOrDefault(x => x.Element("Name").Value == temp);
 
-                if (doc.Descendants("Model").Take(1)?.Elements("HVACDist").SingleOrDefault(x => x.Element("Name").Value == temp)?.Element("AreBuried")?.Value == "1")
+                if (query?.Element("AreBuried")?.Value == "1")
                 {
                     _buriedDuct = "Yes";
+                    break;
+                }
+
+                if (query?.Element("DuctDesign")?.Value == "1")
+                {
+                    _surfaceArea = "Yes";
+                    break;
+                }
+
+                if (query?.Element("_ductInConditioned")?.Value == "Ducts located within the conditioned space (except < 12 lineal ft)" ||
+                    query?.Element("_ductInConditioned")?.Value == "Ducts located entirely in conditioned space" ||
+                    query?.Element("_ductInConditioned")?.Value == "Verified low-leakage ducts entirely in conditioned space")
+                {
+                    _ductInConditioned = "Yes";
                     break;
                 }
             }
@@ -223,7 +243,7 @@ namespace WpfApp1
                 {
                     if (!wallInsulArr.Contains(wall.Element("Construction").Value))
                     {
-
+                        Console.WriteLine(wall.Element("Construction").Value);
                         wallInsulArr.Add(wall.Element("Construction").Value);
 
                         void WallFormater(string wallPathVal)
@@ -247,7 +267,7 @@ namespace WpfApp1
 
                                     _wallInsul24 += firstWordInString;
                                     if (wall.Element("Construction").Value.Split(' ').Last().Contains("R"))
-                                    _wallInsul24 += wall.Element("Construction").Value.Split(' ')[0].Split('-').Last();
+                                    _wallInsul24 += " + " + wall.Element("Construction").Value.Split(' ').Last().Split('-')[1];
                                 }
                             }
                             else
@@ -262,7 +282,7 @@ namespace WpfApp1
 
                                     _wallInsul26 += firstWordInString;
                                     if (wall.Element("Construction").Value.Split(' ').Last().Contains("R"))
-                                        _wallInsul26 += wall.Element("Construction").Value.Split(' ')[0].Split('-').Last();
+                                        _wallInsul26 += " + " + wall.Element("Construction").Value.Split(' ').Last().Split('-')[1];
                                 }
                             }
                         }
@@ -382,7 +402,6 @@ namespace WpfApp1
                             select new
                             {
                                 photovoltaic = proj.Element("PVMinRatedPwrRpt").Value,
-                                hERSIndex = "????",
                                 planStucco = proj.Element("Name").Value,
                                 fileName = proj.Element("ModelFile").Value,
                                 squareFeet = proj.Element("CondFloorArea").Value,
@@ -410,7 +429,6 @@ namespace WpfApp1
                                 infiltration = "",
                                 ductInConditioned = "",
                                 lowLeakageAir = proj.Element("SCSysRpt")?.Element("LLAHUStatus")?.Value,
-                                surfaceArea = "",
                                 insulInspect = "",
                                 fuelType = proj.Element("GasType")?.Value,
 
@@ -435,8 +453,8 @@ namespace WpfApp1
             datasheetCreator("PROJECTNAME", _name);
             datasheetCreator("CITY", _city);
             datasheetCreator("CLIMATEZONE", _climateZone);
-            datasheetCreator("PHOTO", (property.photovoltaic == "0") ? "N/A" : property.photovoltaic + " kWdc");
-            datasheetCreator("HERS", property.hERSIndex);
+            datasheetCreator("PHOTO", (property.photovoltaic == "0") ? "N/A" : (property.photovoltaic.Length == 1) ? property.photovoltaic + ".00 kWdc" : property.photovoltaic + " kWdc");
+            datasheetCreator("HERS", "N/A");
             datasheetCreator("WALLTYPE", _sidingOrStucco);
             datasheetCreator("PLANNAME", _name);
             datasheetCreator("FILENAME", property.fileName);
@@ -468,10 +486,10 @@ namespace WpfApp1
             datasheetCreator("SEERVERIF", (property.seerVerif == "1") ? "Yes" : "-");
             datasheetCreator("EERVERIF", (property.eerVerif == "1") ? "Yes" : "-");
             datasheetCreator("INFILTRATION", (_insulConsQual == "Standard") ? "-" : "Yes ("+ _airLeakage + ")");
-            datasheetCreator("DUCTCOND", "?????");
+            datasheetCreator("DUCTCOND", _ductInConditioned);
             datasheetCreator("LOWLEAK", (property.lowLeakageAir == "Has Low Leakage Air Handler") ? "Yes" : "-");
             datasheetCreator("BURRIEDDUCT", _buriedDuct);
-            datasheetCreator("SURFAREA", "????????");
+            datasheetCreator("SURFAREA", _surfaceArea);
             datasheetCreator("INSULINSPECT", (_Qii == "1") ? "Yes" : "-");
             datasheetCreator("FUELTYPE", property.fuelType);
             datasheetCreator("UEF", _waterHeater);
