@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using Microsoft.Win32;
 
 namespace WpfApp1
@@ -30,7 +31,7 @@ namespace WpfApp1
             InitializeComponent();
         }
 
-        
+
 
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
@@ -44,7 +45,6 @@ namespace WpfApp1
                 FilterIndex = 1,
                 Multiselect = true
             };
-
             cbeccxml.ShowDialog();
 
             string s = cbeccxml.FileName;
@@ -65,28 +65,32 @@ namespace WpfApp1
 
             //            var wallPath = userInput.Elements("Zone").Elements("ExtWall");
             //            var wallPath = userInput.Elements("Zone").Elements("ExtWall");
-            var windowPath = proposed.Descendants("Win");
             var wallNamePath = userInput.Descendants("Attic");
             var roofMatPath = doc.Descendants("Model").Take(1).Descendants("Cons");
 
             /*********************** Misc General Data ***********************/
+            var skyLightExists = doc.XPathSelectElement("//Skylt") != null;
 
             string[] _softversionTemp = Convert.ToString(userInput.Elements("SoftwareVersion").First().Value).Split(' ')[1].Split('.');
-            string _softversion = "CBECC V" + _softversionTemp[1] +"."+ _softversionTemp[2];
+            string _softversion = "CBECC V" + _softversionTemp[1] + "." + _softversionTemp[2];
 
             string _name = DryPath(userInput, "Name");
             string _city = DryPath(userInput, "City");
+            if (_city.Split(' ').Last() != "CA" && !_city.Split(' ').Last().Contains(",CA"))
+            {
+                _city += ", CA";
+            }
 
             string _climateZone = DryPath(userInput, "ClimateZone").Split(' ')[0].Split('Z')[1];
             //            string _aboveCodePerc =  DryPath(standard.Elements("EUseSummary"), "PctSavingsCmpTDV");
             string _aboveCodePerc = standard.Elements("EUseSummary").Elements("PctSavingsCmpTDV").FirstOrDefault()?.Value;
             string _spaceCool = Math.Round(Convert.ToDouble(standard.Elements("EnergyUse").SingleOrDefault(x => x.Element("Name").Value == "EU-SpcClg")?.Elements("PctImproveTDV").SingleOrDefault().Value), 1) + "%";
 
-            Console.WriteLine("abv ----" + _aboveCodePerc);
-            foreach (var VARIABLE in standard.Elements("EUseSummary"))
-            {
-                Console.WriteLine("Var + " + VARIABLE);
-            }
+            //            Console.WriteLine("abv ----" + _aboveCodePerc);
+            //            foreach (var VARIABLE in standard.Elements("EUseSummary"))
+            //            {
+            //                Console.WriteLine("Var + " + VARIABLE);
+            //            }
             /*********************** ATTIC ***********************/
 
             List<string> wallNames = new List<string>();
@@ -114,7 +118,7 @@ namespace WpfApp1
             string _sidingOrStucco = "";
             string _indoorAirQual = doc.Descendants("Model").Skip(1).Take(1).Elements("IAQVentRpt").SingleOrDefault()?.Element("IAQCFM")?.Value;
             string _insulConsQual = userInput.Elements("InsulConsQuality").SingleOrDefault()?.Value;
-            string _airLeakage = (userInput.Elements("ACH50").SingleOrDefault()?.Value.Length == 1) ? userInput.Elements("ACH50").SingleOrDefault()?.Value +".00%" : userInput.Elements("ACH50").SingleOrDefault()?.Value + "%";
+            string _airLeakage = (userInput.Elements("ACH50").SingleOrDefault()?.Value.Length == 1) ? userInput.Elements("ACH50").SingleOrDefault()?.Value + ".00%" : userInput.Elements("ACH50").SingleOrDefault()?.Value + "%";
             string _buriedDuct = "-";
             string _surfaceArea = "-";
             string _ductInConditioned = "-";
@@ -172,7 +176,7 @@ namespace WpfApp1
                     waterHeaterArr.Add(temp);
                     if (temp2.Element("EnergyFactor")?.Value.Split('.').ToList().ElementAt(1)?.Length == 1)
                         temp2.Element("EnergyFactor").Value += "0";
-                    _waterHeater += temp2.Element("EnergyFactor")?.Value + "(" + temp2.Element("TankVolume")?.Value +") ";
+                    _waterHeater += temp2.Element("EnergyFactor")?.Value + "(" + temp2.Element("TankVolume")?.Value + ") ";
                 }
             }
 
@@ -188,8 +192,8 @@ namespace WpfApp1
             foreach (var ceil in wallNamePath)
             {
                 if (!wallNames.Contains(Convert.ToString(ceil.Elements("Construction"))) &&
-                   (string) ceil.Element("Construction") != "Attic Roof Garage")
-                       wallNames.Add(Convert.ToString(ceil.Element("Construction")?.Value));
+                   (string)ceil.Element("Construction") != "Attic Roof Garage")
+                    wallNames.Add(Convert.ToString(ceil.Element("Construction")?.Value));
             }
 
             foreach (var roofingMat in wallNames)
@@ -197,7 +201,7 @@ namespace WpfApp1
                 var roofTypePath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat)?.Element("RoofingLayer")?.Value;
                 var radientBarrierPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat)?.Element("RadiantBarrier")?.Value;
                 var aboveRoofDeckPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat)?.Element("AbvDeckInsulLayer")?.Value;
-                var belowRoofDeckPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat)?.Element("CavityLayer" )?.Value;
+                var belowRoofDeckPath = roofMatPath.SingleOrDefault(x => x.Element("Name").Value == roofingMat)?.Element("CavityLayer")?.Value;
 
 
                 switch (roofTypePath)
@@ -255,7 +259,8 @@ namespace WpfApp1
                             if (firstWordInString == "existing")
                             {
                                 //ignore?
-                            } else if (Convert.ToInt32(rVal) <= 15)
+                            }
+                            else if (Convert.ToInt32(rVal) <= 15)
                             {
 
                                 if (_wallInsul24.Length == 1)
@@ -264,22 +269,22 @@ namespace WpfApp1
                                 if (!_wallInsul24.Contains(firstWordInString))
                                 {
                                     if (_wallInsul24.Length > 1)
-                                       _wallInsul24 += " / ";
+                                        _wallInsul24 += " / ";
 
                                     _wallInsul24 += firstWordInString;
                                     if (wall.Element("Construction").Value.Split(' ').Last().Contains("R"))
-                                    _wallInsul24 += " + " + wall.Element("Construction").Value.Split(' ').Last().Split('-')[1];
+                                        _wallInsul24 += " + " + wall.Element("Construction").Value.Split(' ').Last().Split('-')[1];
                                 }
                             }
                             else
                             {
                                 if (_wallInsul26.Length == 1)
-                                   _wallInsul26 = "";
+                                    _wallInsul26 = "";
 
                                 if (!_wallInsul26.Contains(firstWordInString))
                                 {
                                     if (_wallInsul26.Length > 1)
-                                       _wallInsul26 += " / ";
+                                        _wallInsul26 += " / ";
 
                                     _wallInsul26 += firstWordInString;
                                     if (wall.Element("Construction").Value.Split(' ').Last().Contains("R"))
@@ -330,7 +335,7 @@ namespace WpfApp1
                     }
                 }
 
-                
+
             }
 
             if (abvDeckArr.Count == 0)
@@ -358,12 +363,13 @@ namespace WpfApp1
             List<string> windowsUV = new List<string>();
             List<string> windowsSHGC = new List<string>();
             List<string> windowTypes = new List<string>();
+            
 
             foreach (var zones in proposed.Elements("Zone"))
             {
                 foreach (var walls in zones.Elements("ExtWall"))
                 {
-                    
+
                     foreach (var windows in walls.Elements("Win"))
                     {
                         if (!windowsUV.Contains(windows.Element("NFRCUfactor")?.Value) ||
@@ -440,19 +446,18 @@ namespace WpfApp1
 
             XmlDocument datasheet = new XmlDocument();
 
-
             datasheet.LoadXml(Properties.Resources.Datasheet1);
 
 
             void datasheetCreator(string ID, string textToAppend)
             {
-                datasheet.SelectSingleNode("//*[@id='"+ ID + "']").InnerText = textToAppend;
+                datasheet.SelectSingleNode("//*[@id='" + ID + "']").InnerText = textToAppend;
             }
 
             datasheetCreator("TODAYDATE", DateTime.Now.ToString("MM/dd/yyyy"));
             datasheetCreator("SOFTVERSION", _softversion);
-            datasheetCreator("PROJECTNAME", _name);
-            datasheetCreator("CITY", _city);
+            datasheetCreator("PROJECTNAME", _name + " ");
+            datasheetCreator("CITY", " " + _city);
             datasheetCreator("CLIMATEZONE", _climateZone);
             datasheetCreator("PHOTO", (property.photovoltaic == "0") ? "N/A" : (property.photovoltaic.Length == 1) ? property.photovoltaic + ".00 kWdc" : property.photovoltaic + " kWdc");
             datasheetCreator("HERS", "N/A");
@@ -480,13 +485,13 @@ namespace WpfApp1
             datasheetCreator("DUCTINS", "R-" + property.ductInsul);
             datasheetCreator("WHF", _wholeHouseFan);
             datasheetCreator("FANWAT", (property.fanWattage == "1") ? "Yes" : "-");
-            datasheetCreator("AIRFLOW", (property.airflow == "1") ? "Yes ("+ property.airflowVal + ")" : "-");
+            datasheetCreator("AIRFLOW", (property.airflow == "1") ? "Yes (" + property.airflowVal + ")" : "-");
             datasheetCreator("DUCTTEST", (property.ductTestingReq == "1") ? "Yes (" + property.ductTestingVal + "%)" : "-");
             datasheetCreator("CFM", (_indoorAirQual != "0") ? "Yes (" + _indoorAirQual + ")" : "-");
             datasheetCreator("REFCHARGE", (property.refCharg == "1") ? "Yes" : "-");
             datasheetCreator("SEERVERIF", (property.seerVerif == "1") ? "Yes" : "-");
             datasheetCreator("EERVERIF", (property.eerVerif == "1") ? "Yes" : "-");
-            datasheetCreator("INFILTRATION", (_insulConsQual == "Standard") ? "-" : "Yes ("+ _airLeakage + ")");
+            datasheetCreator("INFILTRATION", (Convert.ToInt32(_airLeakage.Split('.')[0]) >= 5) ? "-" : "Yes (" + _airLeakage + ")");
             datasheetCreator("DUCTCOND", _ductInConditioned);
             datasheetCreator("LOWLEAK", (property.lowLeakageAir == "Has Low Leakage Air Handler") ? "Yes" : "-");
             datasheetCreator("BURRIEDDUCT", _buriedDuct);
@@ -495,27 +500,59 @@ namespace WpfApp1
             datasheetCreator("FUELTYPE", property.fuelType);
             datasheetCreator("UEF", _waterHeater);
             datasheetCreator("DISTRIBUTION", property.distribution);
-           
+
             datasheetCreator("WIN1", (windowTypes.ElementAtOrDefault(0) != null) ? windowTypes[0] : "");
             datasheetCreator("WIN2", (windowTypes.ElementAtOrDefault(1) != null) ? windowTypes[1] : "");
             datasheetCreator("WIN3", (windowTypes.ElementAtOrDefault(2) != null) ? windowTypes[2] : "");
             datasheetCreator("WIN4", (windowTypes.ElementAtOrDefault(3) != null) ? windowTypes[3] : "");
-  
-           
+
+
             datasheetCreator("UVAL1", (windowsUV.ElementAtOrDefault(0) != null) ? windowsUV[0] : "");
             datasheetCreator("UVAL2", (windowsUV.ElementAtOrDefault(1) != null) ? windowsUV[1] : "");
             datasheetCreator("UVAL3", (windowsUV.ElementAtOrDefault(2) != null) ? windowsUV[2] : "");
             datasheetCreator("UVAL4", (windowsUV.ElementAtOrDefault(3) != null) ? windowsUV[3] : "");
 
-            
+
             datasheetCreator("SHGC1", (windowsSHGC.ElementAtOrDefault(0) != null) ? windowsSHGC[0] : "");
             datasheetCreator("SHGC2", (windowsSHGC.ElementAtOrDefault(1) != null) ? windowsSHGC[1] : "");
             datasheetCreator("SHGC3", (windowsSHGC.ElementAtOrDefault(2) != null) ? windowsSHGC[2] : "");
             datasheetCreator("SHGC4", (windowsSHGC.ElementAtOrDefault(3) != null) ? windowsSHGC[3] : "");
 
-
             
-             datasheet.Save(@"C:\Users\" + Environment.UserName + @"\Downloads\" + _name + " - Datasheet.doc");
+            datasheetCreator("SKYLT", (skyLightExists) ? "Skylight" : "");
+            datasheetCreator("UVAL", (skyLightExists) ? userInput.Descendants("Skylt").FirstOrDefault().Element("NFRCUfactor").Value : "");
+            datasheetCreator("SHGC", (skyLightExists) ? userInput.Descendants("Skylt").FirstOrDefault().Element("NFRCSHGC").Value : "");
+
+
+
+
+            datasheet.Save(@"C:\Users\" + Environment.UserName + @"\Downloads\" + _name + " - Datasheet.doc");
+
+
+
+
+
+
+
+
+            /*********************** Change Log ***********************/
+
+            string fileName = @"P:\Software Builds\Datasheet Generator\Changelog.txt";
+
+            string textToAdd = @"Change log implimented
+Fixed the formating at the top (Re: ProjectName in City, State)
+Infiltration < 5 fix
+Gets first skylight values";
+            
+            
+            using (StreamWriter writer = new StreamWriter(fileName, true))
+            {
+                writer.Write(textToAdd);
+            }
+
+
+
+
         }
     }
 }
